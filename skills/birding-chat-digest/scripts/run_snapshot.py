@@ -90,6 +90,15 @@ def free_local_address() -> str:
         return f"127.0.0.1:{listener.getsockname()[1]}"
 
 
+def output_dir(fetch_args: list[str]) -> Path | None:
+    for i, arg in enumerate(fetch_args):
+        if arg == "--out" and i + 1 < len(fetch_args):
+            return Path(fetch_args[i + 1])
+        if arg.startswith("--out="):
+            return Path(arg.split("=", 1)[1])
+    return None
+
+
 def load_account(config_dir: Path, account: str | None) -> dict:
     config = json.loads((config_dir / "chatlog.json").read_text(encoding="utf-8"))
     account = account or config.get("last_account")
@@ -236,6 +245,12 @@ def main(argv: list[str] | None = None) -> int:
     if not 0 <= args.wait < float("inf"):
         parser.error("--wait must be a finite non-negative number")
     config_dir = Path(args.chatlog_config or os.environ.get("CHATLOG_DIR") or Path.home() / ".chatlog").expanduser()
+
+    # Invalidate an earlier run's index before anything can fail, so a snapshot
+    # failure (exit 3) never leaves a previous index.json that looks current.
+    out = output_dir(fetch_args)
+    if out is not None:
+        (out / "index.json").unlink(missing_ok=True)
 
     snapshot = Snapshot(args.reader, config_dir, args.account)
 

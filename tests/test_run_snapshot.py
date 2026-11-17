@@ -136,6 +136,15 @@ class RunTests(SnapshotTestCase):
         self.assertIn("exited with code 7", logs)
         self.assertFalse(self.private.exists())
 
+    def test_snapshot_failure_removes_previous_index(self):
+        out = self.root / "export"
+        out.mkdir()
+        (out / "index.json").write_text('{"failures": 0}')
+        code, logs = self.run_main("--reader", self.fake_reader(), "--chatlog-config", str(self.root / "missing"),
+                                   "--", "--chat", "1@chatroom", "--date", "2026-11-16", "--out", str(out))
+        self.assertEqual(code, 3)
+        self.assertFalse((out / "index.json").exists(), "an earlier index must not survive a snapshot failure")
+
     def test_server_argument_is_rejected(self):
         with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
             run_snapshot.main(["--reader", sys.executable, "--", "--server", "http://x", "--out", "o"])

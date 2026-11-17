@@ -58,7 +58,7 @@
 | 情况 | 识别方式 | 要读的字段 |
 |---|---|---|
 | 链接、文章、笔记、视频号 | `contents.title` 或 `contents.url` 有值 | `contents.title` 和 `contents.desc` 都要读。`desc` 是卡片上可见的说明，常含鸟种、地点、数量，比标题信息多得多 |
-| 引用回复 | `contents.refer` 有值 | `content` 是回复内容，`contents.refer.content` 和 `contents.refer.senderName` 是被引用的消息和发言者（名字已替换为公开昵称） |
+| 引用回复 | `contents.refer` 有值 | `content` 是回复内容，`contents.refer.content` 和 `contents.refer.senderName` 是被引用的消息和发言者（名字已替换为公开昵称）。引用图片等媒体时 `refer.content` 为空，用 `refer.type` 和 `refer.time` 找到被引用的那条消息，不要仅凭前后相邻的消息推断引用对象 |
 | 拍一拍 | `content` 形如 `"甲" 拍了拍 "乙"…` | 互动提示，一般不入报 |
 
 chatlog 默认用你通讯录里的备注名作为 `sender`。脚本已改为公开昵称，**不要从 `contents` 里的其他字段或旧报告把备注名补回来**。

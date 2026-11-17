@@ -48,7 +48,7 @@ python3 scripts/run_snapshot.py -- --groups groups.json \
   --start 2026-11-15T21:00 --end 2026-11-16T21:00 --tz Asia/Shanghai --out ./export
 ```
 
-它把数据库复制到临时目录、启动只读副本的读取器、获取消息后关闭读取器并删除副本，只读取原数据库。退出码 3 表示副本本身失败（复制、启动或清理），按失败如实报告。用户没有读取器时，告诉用户按 https://github.com/theggs/birding-chat-digest/blob/main/chatlog-snapshot-reader/README.md 编译（该说明不随 skill 安装），不要自行编译或改用其他方式绕过。
+它把数据库复制到临时目录、启动只读副本的读取器、获取消息后关闭读取器并删除副本，只读取原数据库。退出码 3 表示副本本身失败（复制、启动或清理），按失败如实报告；此时输出目录中没有本次的 `index.json`，不要读取其中残留的旧文件。用户没有读取器时，告诉用户按 https://github.com/theggs/birding-chat-digest/blob/main/chatlog-snapshot-reader/README.md 编译（该说明不随 skill 安装），不要自行编译或改用其他方式绕过。
 
 ## 流程
 

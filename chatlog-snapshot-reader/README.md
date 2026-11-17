@@ -59,7 +59,7 @@ python3 skills/birding-chat-digest/scripts/run_snapshot.py -- \
 | `--chatlog-config` | chatlog 配置目录，默认取环境变量 `CHATLOG_DIR`，否则为 `~/.chatlog` |
 | `--wait` | 等待读取器就绪的秒数，默认 180 |
 
-退出码：获取完成时与 `fetch_chatlog.py` 相同（0 表示全部成功，1 表示部分群失败）；复制、启动或清理副本失败时为 3。
+退出码：获取完成时与 `fetch_chatlog.py` 相同（0 表示全部成功，1 表示部分群失败）；复制、启动或清理副本失败时为 3。脚本在复制数据库前会删除输出目录中上次的 `index.json`，退出码为 3 时请勿读取输出目录中残留的旧文件。
 
 注意事项：
 
