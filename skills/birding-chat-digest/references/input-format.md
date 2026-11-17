@@ -31,13 +31,13 @@
 
 | 字段 | 用途 |
 |---|---|
-| `date` | 区间结束所在的日期，作为报告日期 |
+| `date` | 区间内最后一个时刻所在的日期，作为报告日期。例如 `--date 2026-11-16` 的区间是 16 日 00:00 至 17 日 00:00，`date` 为 16 日 |
 | `window_start` / `window_end` | 统计区间，含起点、不含终点 |
 | `fetched` | 区间内的消息数（已去重） |
-| `source_coverage` | 区间涉及的每个自然日：chatlog 报告的当天总数和实际取到的条数。**两者不一致就是取数不完整**，要在数据覆盖里写明日期和差额 |
+| `source_coverage` | 区间涉及的每个自然日：chatlog 报告的当天总数和实际取到的条数。两者不一致说明当天可能没取全，要在数据覆盖里写明日期和差额；该群不因此记为失败 |
 | `naming_coverage.unresolved_senders` | 没取到群昵称也没取到微信昵称的发言者数 |
 | `type_counts` | 各类消息数，用来写数据覆盖里的图片、表情、系统消息数量 |
-| `error` | 该群取数失败的原因；有这个字段的群没有消息文件 |
+| `error` | 该群取数失败的原因；有这个字段的群没有消息文件（脚本每次运行前会删除输出目录里同名的旧文件） |
 | `failures` | 失败的群数；大于 0 时报告末尾必须列出 |
 
 ## 群消息文件
@@ -49,8 +49,16 @@
 | `time` / `timestamp` | 发送时间 |
 | `sender` | 发言者名字，已按“群昵称 → 微信昵称”替换；取不到时为空字符串 |
 | `sender_name_source` | `group_nickname`、`wechat_nickname`、`unavailable`、`system` |
-| `type` | `text`、`share`（链接/文章/视频号/小程序）、`image`、`sticker`、`video`、`voice`、`system` 等 |
-| `content` | 文本内容；分享类消息是可见的标题和说明 |
-| `contents` | 结构化内容，如引用回复（被引用者名字同样已替换）、分享链接的标题和描述 |
+| `type` | `text`、`share`、`image`、`sticker`、`video`、`voice`、`location`、`system` 等。`share` 不一定是外部链接，也包括引用回复和拍一拍 |
+| `content` | 文本内容。链接类分享通常只有标题；引用回复是回复者自己的话 |
+| `contents` | 结构化内容，见下文 |
+
+### `share` 消息的三种常见结构
+
+| 情况 | 识别方式 | 要读的字段 |
+|---|---|---|
+| 链接、文章、笔记、视频号 | `contents.title` 或 `contents.url` 有值 | `contents.title` 和 `contents.desc` 都要读。`desc` 是卡片上可见的说明，常含鸟种、地点、数量，比标题信息多得多 |
+| 引用回复 | `contents.refer` 有值 | `content` 是回复内容，`contents.refer.content` 和 `contents.refer.senderName` 是被引用的消息和发言者（名字已替换为公开昵称） |
+| 拍一拍 | `content` 形如 `"甲" 拍了拍 "乙"…` | 互动提示，一般不入报 |
 
 chatlog 默认用你通讯录里的备注名作为 `sender`。脚本已改为公开昵称，**不要从 `contents` 里的其他字段或旧报告把备注名补回来**。

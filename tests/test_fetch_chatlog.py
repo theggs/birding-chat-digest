@@ -163,6 +163,19 @@ class FetchChatlogTests(unittest.TestCase):
         self.assertNotIn("999@chatroom", logs)  # chat ids stay out of logs
         self.assertEqual(index["groups"][0]["fetched"], 1)
 
+    def test_rerun_failure_removes_stale_group_file(self):
+        with FakeChatlog() as fake:
+            fake.history[(GROUP, "2026-11-16")] = [msg(1, 16, 8)]
+            code, _, _ = run(fake, self.out, "--chat", GROUP, "--date", "2026-11-16")
+        self.assertEqual(code, 0)
+        self.assertTrue((self.out / "111.json").exists())
+        with FakeChatlog() as fake:  # the group is unknown now, so fetching it fails
+            fake.history[("999@chatroom", "2026-11-16")] = []
+            code, index, _ = run(fake, self.out, "--chat", GROUP, "--date", "2026-11-16")
+        self.assertEqual(code, 1)
+        self.assertIn("error", index["groups"][0])
+        self.assertFalse((self.out / "111.json").exists(), "stale file from the earlier run must be removed")
+
     def test_page_budget_413_retries_same_offset_with_smaller_page(self):
         rows = [msg(i, 16, 8 + i % 10) for i in range(1, 8)]
         with FakeChatlog() as fake:

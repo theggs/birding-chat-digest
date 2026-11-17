@@ -237,6 +237,10 @@ def main(argv: list[str] | None = None) -> int:
     server = args.server.rstrip("/")
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+    # Remove results of an earlier run in this directory first, so a group that
+    # fails now can never be read from a stale file.
+    for stale in [out / "index.json", *(out / f"{slugify(g['chat'])}.json" for g in groups)]:
+        stale.unlink(missing_ok=True)
     index = {
         "date": (end - dt.timedelta(microseconds=1)).astimezone(zone).date().isoformat(),
         "window_start": start.isoformat(),
