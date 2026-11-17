@@ -27,6 +27,7 @@
 确认本机 chatlog 已启动（<http://127.0.0.1:5030>），然后运行：
 python3 <skill 目录>/scripts/fetch_chatlog.py --groups <groups.json> --start <本期起点> --end <本期终点> --tz <Asia/Shanghai> --out <输出目录>/<日期>/<批次>/<时段>
 chatlog 连不上或脚本整体失败时停止并报错，不读取旧数据。退出码为 1 但写出了 index.json 时，按其中的 error 如实报告失败的群，其余群照常总结。
+<已编译副本读取器时：改为运行 python3 <skill 目录>/scripts/run_snapshot.py -- 加上与上面相同的参数（不含 --server）。>
 取数后核对 index.json 的 window_start/window_end 与本期一致；不一致时停止并报错。
 
 3. 总结

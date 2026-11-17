@@ -12,6 +12,10 @@
 
 skill 附带的脚本 `scripts/fetch_chatlog.py` 从 chatlog 获取指定时间区间内的全部消息，并将发言者名称替换为群昵称或微信昵称，不使用本人通讯录中的备注名。
 
+## 读取超时与副本模式
+
+微信频繁写入数据库时，直接通过 chatlog 读取聊天记录可能超时。此时可以使用副本模式：先复制一份数据库，再从副本读取。副本模式需要 chatlog 源码和 Go 编译环境，仅支持 macOS 和 Linux，详见 `chatlog-snapshot-reader/README.md`。
+
 ## 安装
 
 ### 由 AI Agent 安装
@@ -52,10 +56,12 @@ Agent 会先运行消息获取脚本，再逐个群生成总结。
 
 ```
 AGENT_INSTALL.md                # 供 AI Agent 执行的安装指南
+chatlog-snapshot-reader/        # 副本模式的读取器源码和编译脚本
 skills/birding-chat-digest/
 ├── SKILL.md                    # 总结流程和通用写作规则
 ├── scripts/
-│   └── fetch_chatlog.py        # 从 chatlog 获取指定时间区间内的全部消息
+│   ├── fetch_chatlog.py        # 从 chatlog 获取指定时间区间内的全部消息
+│   └── run_snapshot.py         # 副本模式：复制数据库后再获取消息
 └── references/
     ├── styles.md               # 三种总结风格：简报、时间线回顾、详略回顾
     ├── report-format.md        # 报告结构、数据覆盖情况说明、归档规则
@@ -66,7 +72,8 @@ examples/
 ├── groups.example.json         # 群列表示例
 └── scheduled-task-prompt.md    # 每日定时生成日报的提示词模板
 tests/
-└── test_fetch_chatlog.py       # 消息获取脚本的测试（使用模拟的 chatlog 服务）
+├── test_fetch_chatlog.py       # 消息获取脚本的测试（使用模拟的 chatlog 服务）
+└── test_run_snapshot.py        # 副本模式的测试
 ```
 
 ## 隐私说明

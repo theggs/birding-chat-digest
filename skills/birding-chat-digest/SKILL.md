@@ -30,6 +30,17 @@ python3 scripts/fetch_chatlog.py --groups groups.json \
 
 产物格式见 [references/input-format.md](references/input-format.md)。
 
+### 读取超时时：副本模式
+
+微信频繁写入数据库时，直接读取可能超时，表现为群的 `error` 里出现 `TimeoutError` 或 `failed after 5 attempts`。此时如果用户已编译副本读取器（设置了环境变量 `CHATLOG_SNAPSHOT_READER`，或用户告知了读取器路径），改用 `scripts/run_snapshot.py` 重新获取，`--` 之后的参数与 `fetch_chatlog.py` 相同，不要传 `--server`：
+
+```bash
+python3 scripts/run_snapshot.py -- --groups groups.json \
+  --start 2026-11-15T21:00 --end 2026-11-16T21:00 --tz Asia/Shanghai --out ./export
+```
+
+它把数据库复制到临时目录、启动只读副本的读取器、获取消息后关闭读取器并删除副本，只读取原数据库。退出码 3 表示副本本身失败（复制、启动或清理），按失败如实报告。用户没有读取器时，告诉用户可以按仓库中 `chatlog-snapshot-reader/README.md` 编译，不要自行编译或改用其他方式绕过。
+
 ## 流程
 
 1. **确定统计区间并取数。** 以 `index.json` 的 `window_start`/`window_end` 为准（含起点、不含终点），统一使用一个时区。只总结区间内的新消息；更早的消息只用来理解上下文，不计入条数，也不重复总结。

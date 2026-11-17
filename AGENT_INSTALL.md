@@ -80,7 +80,28 @@ cp "$TMP/birding-chat-digest/examples/groups.example.json" <工作目录>/groups
 
 如果用户需要每天定时生成日报，把 `examples/scheduled-task-prompt.md` 也复制到工作目录，并告诉用户按其中说明创建定时任务。
 
-## 7. 清理并报告
+## 7. 副本模式（可选）
+
+只有在用户提到读取聊天记录超时，或明确要求使用副本模式时才执行；否则跳过，只在报告中告诉用户有这个功能。
+
+1. 确认用户使用 macOS 或 Linux。Windows 不支持，告诉用户参考 `chatlog-snapshot-reader/README.md` 的 Windows 一节自行调整，然后跳过。
+2. 确认已安装 Go（`go version`），并询问用户 chatlog 源码目录的位置。用户没有 chatlog 源码时，跳过本步骤。
+3. 编译读取器：
+
+```bash
+python3 "$TMP/birding-chat-digest/chatlog-snapshot-reader/build_reader.py" \
+  --chatlog-src <chatlog 源码目录> --out ~/bin/chatlog-snapshot-reader
+```
+
+4. 编译成功后，用读取器运行集成测试：
+
+```bash
+cd "$TMP/birding-chat-digest" && CHATLOG_SNAPSHOT_READER=~/bin/chatlog-snapshot-reader python3 -m unittest discover -s tests
+```
+
+5. 提醒用户把 `export CHATLOG_SNAPSHOT_READER=~/bin/chatlog-snapshot-reader` 加入 shell 配置文件，或询问后代为添加。
+
+## 8. 清理并报告
 
 ```bash
 rm -rf "$TMP"
@@ -91,6 +112,7 @@ rm -rf "$TMP"
 - skill 安装位置；
 - 测试结果；
 - chatlog 是否在运行（以及使用的地址）；
+- 是否编译了副本读取器及其路径；
 - `groups.json` 的位置，以及是否已填入真实的群；
 - 下一步可以直接使用的指令，例如：
   `使用 birding-chat-digest skill 总结 <工作目录>/groups.json 中的群聊，统计区间为 <起点> 至 <终点>，总结风格为简报。`
