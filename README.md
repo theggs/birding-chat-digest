@@ -8,6 +8,8 @@
 
 使用前需要在本机运行 chatlog。本项目不包含 chatlog。
 
+运行环境需要 Python 3.9 或以上版本。Windows 用户还需安装时区数据包：`python -m pip install tzdata`。
+
 skill 附带的脚本 `scripts/fetch_chatlog.py` 从 chatlog 获取指定时间区间内的全部消息，并将发言者名称替换为群昵称或微信昵称，不使用本人通讯录中的备注名。
 
 ## 安装

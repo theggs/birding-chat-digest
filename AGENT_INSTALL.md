@@ -13,6 +13,14 @@ python3 -c "import sys; assert sys.version_info >= (3, 9), sys.version; print(sy
 
 缺少 git 或 Python 3.9 以上版本时，告诉用户需要先安装，然后停止。
 
+在 Windows 上，Python 不带时区数据，还需检查并安装 tzdata：
+
+```powershell
+python -c "from zoneinfo import ZoneInfo; ZoneInfo('Asia/Shanghai'); print('tz ok')"
+# 上一条报 ZoneInfoNotFoundError 时执行：
+python -m pip install tzdata
+```
+
 ## 2. 确定安装目录
 
 根据你自己是哪个 Agent 工具，选择 skills 目录：
