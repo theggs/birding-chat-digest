@@ -17,7 +17,7 @@
 
 1. 确定本期
 首先读取工具返回的当前实际时间，不把聊天里的日期当作当前时间。本任务的计划时点为每天 <12:05 和 21:05>（统计区间按 12:00 和 21:00 划分，启动延后 5 分钟，确保区间已经结束）。按以下优先级确定本期：
-- 用户明确指定了日期或时段时，以指定为准。
+- 用户明确指定了日期或时段时，以指定为准：只给日期时取该日最后一个已结束的时段；只给时段时取最近一次已结束的该时段。
 - 运行上下文给出了调度器的原计划时点时，以它为准；提前或延迟启动都不改成相邻周期。
 - 否则取不晚于当前时间的最近一个计划时点（恰好等于计划时点也算）。
 确定后固定本期的日期、时段和统计区间。<12:00 时段：前一天 21:00 至当天 12:00；21:00 时段：当天 12:00 至 21:00。>
@@ -25,11 +25,12 @@
 
 2. 取数
 确认本机 chatlog 已启动（<http://127.0.0.1:5030>），然后运行：
-python3 <skill 目录>/scripts/fetch_chatlog.py --groups <groups.json> --start <本期起点> --end <本期终点> --tz <Asia/Shanghai> --out <取数目录>/<日期>/<批次>/<时段>/<运行时间 YYYYMMDD-HHmmss>
+python3 <skill 目录>/scripts/fetch_chatlog.py --groups <groups.json> --start <本期起点> --end <本期终点> --tz <Asia/Shanghai> --out <取数目录>/<日期>/<批次>/<时段>/<运行标识：运行时间 YYYYMMDD-HHmmss 加任务 ID 或随机后缀>
 <已编译副本读取器时：改为运行 python3 <skill 目录>/scripts/run_snapshot.py -- 加上与上面相同的参数（不含 --server）。>
 - chatlog 连不上、脚本整体失败（没有写出本次的 index.json），或 index.json 中所有群都失败：停止，只输出并归档错误说明，不生成日报，不读取旧数据。
 - 退出码为 1 且至少一个群成功：照常总结成功的群，在数据覆盖中逐群写明失败原因。
-- 取数后核对 index.json 的 window_start/window_end 与本期一致；不一致时停止并报错。
+- 取数后核对 index.json 的 window_start/window_end 与本期一致；不一致时按整体失败处理。
+- 脚本返回 0、1 以外的退出码（例如副本模式的 3），即使目录里留有 index.json，也按整体失败处理。
 以本次的 index.json 为准读取各群全量消息。
 
 3. 总结
@@ -40,15 +41,16 @@ python3 <skill 目录>/scripts/fetch_chatlog.py --groups <groups.json> --start <
 
 <启用审稿时：
 4. 审稿
-报告写成初稿后，先不生成长图、不归档、不发布。把初稿和本次 index.json 的路径交给 <审稿 Agent>，按 skill 的 references/review.md 审稿；审稿人只提意见。逐条核对意见，接受的照改，不接受的说明理由。审稿意见和理由只留在内部记录，不写进报告和长图。>
+报告写成初稿后，先不生成长图、不归档、不发布。把初稿和本次 index.json 的路径交给 <审稿 Agent>，按 skill 的 references/review.md 审稿；审稿人只提意见。逐条核对意见，接受的照改，不接受的说明理由。审稿意见和理由只留在仅授权人员可见的内部记录里，不写进报告和长图。>
 
 5. 长图（可选）
 <需要分享长图时：终稿完成后，按 skill 的 preview-image 规范生成 report-preview.md 和 report-preview.png。>
 
 6. 归档
 本期归档目录为 <归档目录>/<日期>/<批次>/<时段>/，重跑时直接覆盖，只保留本期最新结果。
-- 成功时：终稿和长图都就绪后再写入 report.md（及 report-preview.md、report-preview.png），并删除残留的 error.md。本次没有生成长图时，删除目录中旧的 report-preview.*，避免旧长图和新报告混用。
-- 整体失败时：删除目录中旧的 report.md 和 report-preview.*，只保存 error.md。
+- 写入或删除前先确认本次仍是该期最新的一次运行（例如比较运行标识）；已有更新的运行完成时，本次不归档、不发布，并说明原因。
+- 成功时：终稿完成后写入 report.md，删除残留的 error.md。长图渲染成功时一并写入 report-preview.md、report-preview.png；本次没有生成长图或渲染失败时，删除目录中旧的 report-preview*，避免旧长图和新报告混用，并在输出中说明渲染失败。
+- 整体失败时：删除目录中旧的 report*.md 和 report-preview*（含旧版遗留的带时间戳副本），只保存 error.md。
 
 7. 输出
 - 全程使用简体中文。
