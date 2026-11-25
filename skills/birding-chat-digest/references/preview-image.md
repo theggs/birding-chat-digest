@@ -30,7 +30,8 @@
 - 鸟名保持加粗；不加装饰页眉、页脚或卡片。
 - 只出一张连续长图，不切片、不分页。
 - 保存为 `report-preview.png`；同一期重跑时直接覆盖。
-- 取数整体失败时不生成长图；渲染失败时如实说明，完整报告照常输出。
+- 取数整体失败时不生成长图；渲染失败时如实说明，完整报告照常输出，并删除归档目录中旧的 `report-preview.*`，避免旧长图被当成本期结果。
+- 审稿意见和审稿处理说明不进入长图。
 
 常用工具：Playwright / Puppeteer 加载 [github-markdown-css](https://github.com/sindresorhus/github-markdown-css)，`fullPage: true` 截图。
 
