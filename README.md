@@ -4,6 +4,8 @@
 
 其中的规则来自多个观鸟群每日两次的日报实践，并针对实际出现的问题逐条修订，例如：消息过多时被抽样处理、获取消息失败被写成“本期无消息”、群成员的推测被写成确定的鸟讯、使用本人通讯录中的备注名称呼群成员。
 
+默认的“分类简报”风格把内容分成鸟讯、讨论和活动召集三类：鸟讯按“地点 → 鸟种”分条，讨论按论点分条，避免逐人复述聊天。需要更稳定的质量时，可以启用审稿：由另一个 Agent 对照原始消息审稿，写作者确认后再发布（见 [审稿说明](skills/birding-chat-digest/references/review.md)）。
+
 ## 前提条件
 
 使用前需要在本机运行 chatlog。本项目不包含 chatlog。
@@ -45,7 +47,7 @@ cp -r birding-chat-digest/skills/birding-chat-digest ~/.claude/skills/
 2. 向 Agent 发出如下指令：
 
 ```text
-使用 birding-chat-digest skill 总结 groups.json 中的群聊，统计区间为 2026-11-15 21:00 至 2026-11-16 21:00，总结风格为简报。
+使用 birding-chat-digest skill 总结 groups.json 中的群聊，统计区间为 2026-11-15 21:00 至 2026-11-16 21:00，总结风格为分类简报。
 ```
 
 Agent 会先运行消息获取脚本，再逐个群生成总结。
@@ -63,7 +65,8 @@ skills/birding-chat-digest/
 │   ├── fetch_chatlog.py        # 从 chatlog 获取指定时间区间内的全部消息
 │   └── run_snapshot.py         # 副本模式：复制数据库后再获取消息
 └── references/
-    ├── styles.md               # 三种总结风格：简报、时间线回顾、详略回顾
+    ├── styles.md               # 总结风格：分类简报（默认）、简报、时间线回顾、详略回顾
+    ├── review.md               # 可选的审稿流程和审稿清单
     ├── report-format.md        # 报告结构、数据覆盖情况说明、归档规则
     ├── preview-image.md        # 分享长图的内容筛选和渲染规范
     ├── input-format.md         # 消息获取脚本输出文件的格式
